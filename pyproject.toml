@@ -1,0 +1,12 @@
+[project]
+name = "biofunc"
+version = "0.1.0"
+description = "bunch of functions to make bioinformatics easier"
+
+[build-system]
+requires = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "flit_core >=3.11,<4"]
+build-backend = "flit_core.buildapi"
