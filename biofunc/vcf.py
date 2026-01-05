@@ -1,4 +1,4 @@
-
+from .het import _calc_hets
 
 head_idx = {
     "CHROM": 0,
@@ -59,8 +59,10 @@ def vcf_to_bed(input:str, output:str, header:bool=False, expand_info:bool=False)
                     output_file.write("\t" + "\t".join(info_headers) + "\n")
                     headers_written = True
 
+            het = _calc_hets(line=line)
+            het = [str(x) for x in het]
             # Write chrom, chromStart, chromEnd, and columns if enabled
-            out_line = "\t".join(line[:2] + [chrom_end] + [v for k,v in info.items() if expand_info]) + "\n"
+            out_line = "\t".join(line[:2] + [chrom_end] + [v for k,v in info.items() if expand_info] + het) + "\n"
             output_file.write(out_line)
         
 

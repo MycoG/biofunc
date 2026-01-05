@@ -1,21 +1,23 @@
 import pandas as pd
 from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 
-def plot_mean(
+def plot_hmean(
         df, 
         col, 
         ax) -> None:
     """
-    plot mean of all data as horizontal line
+    plot mean of dataframe column as horizontal line
 
     """
     #plot global mean
     global_mean = df[col].mean()
     ax.hlines(global_mean, xmin=-500_000, xmax=500_000, linestyles='dotted', linewidth=2, color='indigo', label=f'mean = {global_mean:.3f}')
     return
+
 
 def plot_rolling_mean(
         df:pd.DataFrame,
@@ -46,22 +48,89 @@ def plot_rolling_mean(
         plt.plot(df['min-dist'], df['rolling-mean'], color='red', label=f"rolling-mean of {on}", linewidth=2)
     return
 
-def plot_interpolated_mean(
+
+def plot_interp_mean(
         df: pd.DataFrame,
         x: str,
         y: str,
+        window_size=11,
+        ax: Axes = None,
         ):
     """
-    
+    If there
+
     :param:
     """
-    #groupby some column, and calculate the mean
-    data = df.copy().sort_values(group_by)
-    groupby = data.groupby(group_by).mean()
-    #interpolate the calculated mean
+    data = df.copy().sort_values(x)
+    
+    #groupby the x value, first
+    groupby = data.groupby(x)[y].mean()
+    xvals = groupby.index.to_list()
+    yvals = groupby.to_list()
+
+    #create new points in between min and max
+    xmin, xmax = np.min(xvals), np.max(xvals)
+    len_xrange = np.abs(xmin) + np.abs(xmax) + 1
+    xnew = np.linspace(xmin, xmax, len_xrange)
+    ynew = np.interp(xnew, xvals, yvals)
+
+    #create new dataframe using xnew and ynew
+    df = pd.DataFrame({"x": xnew, "y": ynew})
+
+    #get rolling mean
+    rolling_mean = df.rolling(window_size, center=True)['y'].mean()
+
+    #plot
+    if ax != None:
+        ax.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
+    else:
+        plt.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
+
     return
 
-def plot_mindist(df: pd.DataFrame, col:str, out:str,
+#WIP
+def plot_density(
+        df: pd.DataFrame,
+        x: str,
+        window_size=11,
+        ax: Axes = None,
+        ):
+    """
+    If there
+
+    :param:
+    """
+    data = df.copy().sort_values(x)
+    
+    #groupby the x value, first
+    groupby = data.groupby(x).size()
+    xvals = groupby.index.to_list()
+    yvals = groupby.to_list()
+    
+    ax.plot(xvals, yvals)
+
+    # #create new points in between min and max
+    xmin, xmax = np.min(xvals), np.max(xvals)
+    len_xrange = np.abs(xmin) + np.abs(xmax) + 1
+    xnew = np.linspace(xmin, xmax, len_xrange)
+    # ynew = np.interp(xnew, xvals, yvals)
+
+    # #create new dataframe using xnew and ynew
+    # df = pd.DataFrame({"x": xnew, "y": ynew})
+
+    # #get rolling mean
+    # rolling_mean = df.rolling(window_size, center=True)['y'].mean()
+
+    # #plot
+    # if ax != None:
+    #     ax.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
+    # else:
+    #     plt.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
+
+    return
+
+
+def plot_mindist(df: pd.DataFrame, col:str, out:str=None,
                 range:int=50_000, 
                 suptitle:str=None,
                 scale='linear',
@@ -107,4 +176,4 @@ def plot_mindist(df: pd.DataFrame, col:str, out:str,
     ax.set_title(f"{range}bp from SNP | window_size={window_size} | n={size}")
     ax.legend(loc="upper right")
     fig.suptitle(suptitle)
-    plt.savefig(out)
+    return

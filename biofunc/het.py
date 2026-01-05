@@ -34,16 +34,7 @@ def convert_het_bed(path, out=None) -> None:
 
     return
 
-def calc_het(path) -> None:
-    """
-    calculates heterozygosity using 
-
-    :param path: A path to a VCF file.
-    :type path: str
-    """
-    #TODO: add output paramater to control filename, location output
-
-    def __calc_hets(line:str):
+def _calc_hets(line:str):
         """
         Calculate observed and expected heterozygosity per TR
 
@@ -83,6 +74,15 @@ def calc_het(path) -> None:
         het_est = 1 - (est_hom / ( 2 * n_samples ) ** 2 )        # est_heterozygosity = (1 - est homozygosity)
 
         return het_obs, het_est
+
+def calc_het(path) -> None:
+    """
+    calculates heterozygosity using 
+
+    :param path: A path to a VCF file.
+    :type path: str
+    """
+    #TODO: add output paramater to control filename, location output
     
     f = open(path, 'r')
     g = open(path+".het", "w")
@@ -100,7 +100,7 @@ def calc_het(path) -> None:
 
         else:
             line = line.strip().split("\t")
-            het_obs, het_est = __calc_hets(line)
+            het_obs, het_est = _calc_hets(line)
 
             g.write("\t".join([ str(t) for t in line[:n_header_cols] ] + [str(het_obs), str(het_est)]) + "\n")
 
@@ -108,3 +108,4 @@ def calc_het(path) -> None:
     g.close()
     
     return
+
