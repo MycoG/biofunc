@@ -1,4 +1,5 @@
 from .het import _calc_hets
+import gzip
 
 head_idx = {
     "CHROM": 0,
@@ -70,3 +71,99 @@ def vcf_to_bed(input:str, output:str, header:bool=False, expand_info:bool=False)
     output_file.close()
 
     return
+
+def _calculate_het(line):
+    line = line.split("\t")
+    gt_lines = line[9:]
+
+    num_alt_alleles = len(line[4].split(","))
+    allele_dict = { str(k):0 for k in range(0,num_alt_alleles+1) }
+
+    num_het = 0
+    num_indiv = 0
+    for i, genotype in enumerate(gt_lines):
+        genotype:str
+
+        alleles = genotype.split("|")
+        #skip more /less than 2 alleles
+        if len(alleles) != 2:
+            continue
+        
+        a1, a2 = alleles
+
+        #check if contains missing genotypes
+        #if it does, do not include in calculation
+        if ((a1 == ".") or (a2 == ".")):
+            #skip if either allele is missing
+            continue
+        else:
+            num_indiv += 1
+            if a1 != a2:
+                num_het += 1
+
+            allele_dict[a1] += 1
+            allele_dict[a2] += 1
+    
+    if num_indiv == 0:
+        return (None, None)
+
+    Ho = num_het / num_indiv
+    Homo_e = 0
+    for allele, freq in allele_dict.items():
+        Homo_e += ( freq / (2*num_indiv) ) ** 2
+
+    He = 1-Homo_e
+    return Ho, He
+    
+def calc_het(path, out):
+    f = open(path, 'r')
+    g = open(out, "w")
+
+    for line in f.readlines():
+        line = line.strip()
+        
+        if line.startswith("#"):
+            continue
+        else:
+            hets = _calculate_het(line)
+            chrom, pos = line.split("\t")[:2]
+            g.write("\t".join([str(x) for x in [chrom, pos, pos]] + [str(x) for x in hets])  + "\n")
+            
+    
+    f.close()
+    g.close()
+
+    #write header
+    with open(out+".header", 'w') as f:
+        f.write("\n".join(["chrom", "start", "end", "O(Het)", "E(Het)"]))
+
+def calc_het_gz(path, out):
+    #get num lines in path
+    print("finding num of lines...")
+    with gzip.open(path, 'rb') as f:
+        num_lines = sum(1 for _ in f)
+    print(f"num of lines: {num_lines}")
+
+    open(out, "w").write("")
+    
+    with gzip.open(out, 'at') as g:
+        with gzip.open(path, 'rt') as f:
+            print("opened file...")
+            for i, line in enumerate(f):
+                print(f"{i} / {num_lines} processed.", end="\r")
+                line = line.strip()
+                if line.startswith("#"):
+                    continue
+                else:
+                    hets = _calculate_het(line)
+
+                    #if hets is invalid, return empty strings
+                    if hets == (None, None):
+                        hets = ["", ""]
+
+                    chrom, pos = line.split("\t")[:2]
+                    g.write("\t".join([str(x) for x in [chrom, pos, pos]] + [str(x) for x in hets])  + "\n")
+            
+    #write header
+    with open(out+".header", 'w') as f:
+        f.write("\n".join(["chrom", "start", "end", "O(Het)", "E(Het)"]))

@@ -1,8 +1,6 @@
 import pandas as pd
-from pathlib import Path
-from typing import Union
 
-def load_bed(path:Union[str, Path], header=True) -> pd.DataFrame:
+def load_bed(path:str, header=True) -> pd.DataFrame:
     """
     load BED file as pandas DataFrame
 
@@ -11,7 +9,6 @@ def load_bed(path:Union[str, Path], header=True) -> pd.DataFrame:
     :type header: bool
     """
     #TODO: allow for headers to be added, like pd.read_csv(names=)
-    path = Path(path)
 
     if header:
         with open(path+".header", 'r') as f:

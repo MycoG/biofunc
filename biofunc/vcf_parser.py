@@ -1,5 +1,6 @@
 import gzip
 from pathlib import Path
+import json
 
 class _Record():
     def __init__(self,
@@ -96,6 +97,7 @@ class VCF():
         field_dict = {}
         items = field.split(",")
         for item in items:
+            print(field)
             key, value = item.split("=")
             field_dict[key] = value
         return field_dict
