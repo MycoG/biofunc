@@ -10,3 +10,7 @@ requires = [
     "matplotlib",
     "flit_core >=3.11,<4"]
 build-backend = "flit_core.buildapi"
+
+[project.scripts]
+abmindist = "biofunc.abmindist:main"
+plotmindist = "biofunc.plotmindist:main"
