@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-program_name = "plotmindist.py"
+program_name = "plotmindist"
 description = "plot features according to minimum distance column, and log some summary stats"
 
 #test command:
@@ -72,7 +72,7 @@ def _get_quant_df(df:pd.DataFrame, col:str, low_quant:float, high_quant:float):
         .sample(int(np.average([len(high_filt_df), len(low_filt_df)])))
     return low_filt_df, mid_filt_df, high_filt_df
 
-def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str, pltlabel:str, rolling_window_size:int=50):
+def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str, pltlabel:str, rolling_window_size:int=50, quant_col:str="calibrated_smoothed P(sweep)"):
     
     #create output directory if not valid
     out_dir:Path = Path(out_dir)
@@ -104,7 +104,6 @@ def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str,
         pltlabel = ""
 
     #generate quantiles
-    quant_col = "calibrated_smoothed P(sweep)"
     q_val, low_qval, high_qval = _gen_quant(bedfile, quant_col)
     low_df, mid_df, high_df = _get_quant_df(bedfile, quant_col, low_qval, high_qval)
     log_write(f"INFO: q_col - {quant_col}")
@@ -116,6 +115,7 @@ def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str,
         ("low-0.01", f"{quant_col}<={low_qval:.4f}", low_df),
         ("mid-0.98", f"{low_qval:.3f}<{quant_col}<{high_qval:.4f}", mid_df),
         ("top-0.01", f"{quant_col}>={high_qval:4f}", high_df),
+        ("all", f"all qval", bedfile.sample(len(mid_df)))
     ]
     
     #plot by each quantile, column, and range
@@ -207,7 +207,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-c", "--cols", help="comma-separated list of columns to plot")
     parser.add_argument("-r", "--ranges", help="comma-separated list of ranges to plot")
     parser.add_argument("-l", "--label")
-    parser.add_argument("-w", "--rolling_window", help="rolling window size (in bp) DEFAULT:50")
+    parser.add_argument("-w", "--rolling_window", help="rolling window size (in bp)", default=50)
+    parser.add_argument("-q", "--quantile_column", default="calibrated_smoothed P(sweep)")
     return parser.parse_args()
 
 def main():
@@ -221,7 +222,8 @@ def main():
         out_name=args.out_name,
         out_dir=args.out_dir,
         pltlabel=args.label,
-        rolling_window_size=window_size
+        rolling_window_size=window_size,
+        quant_col=args.quantile_column
     )
 
 if __name__ == "__main__":

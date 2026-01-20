@@ -14,3 +14,4 @@ build-backend = "flit_core.buildapi"
 [project.scripts]
 abmindist = "biofunc.abmindist:main"
 plotmindist = "biofunc.plotmindist:main"
+calchet = "biofunc.calchet:main"

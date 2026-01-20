@@ -9,7 +9,7 @@ from datetime import datetime
 import sys
 import os
 
-program_name = "abmindist.py"
+program_name = "abmindist"
 description = "calculate minimum distance between two BED files"
 
 #test command:
@@ -89,12 +89,12 @@ def abmindist(A_bed:str, B_bed:str, out_name:str, out_dir:str, dist:int=5_000) -
     log_write(f"Writing tmp headers...")
     with open(outheadertmp, 'w') as f:
         with open(A_header_path, 'r') as g:
-            ahead = g.read().split("\n")
+            ahead = g.read().strip().split("\n")
             aheaders = ["a_"+x for x in ahead[:3]] + ahead[3:]
         with open(B_header_path, 'r') as g:
-            bhead = g.read().split("\n")
+            bhead = g.read().strip().split("\n")
             bheaders = ["b_" +x for x in bhead[:3]] + bhead[3:]
-        f.write("\n".join(aheaders + bheaders))
+        f.write("\n".join(aheaders + bheaders)+"\n")
     log_write(f"Headers written to {str(outheadertmp.resolve())} ! ")
 
     #calculate mindist

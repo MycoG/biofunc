@@ -12,7 +12,7 @@ def load_bed(path:str, header=True) -> pd.DataFrame:
 
     if header:
         with open(path+".header", 'r') as f:
-            cols = f.read().split("\n")
+            cols = f.read().strip().split("\n")
         df = pd.read_csv(path, names=cols, sep='\t', index_col=False)
         return df
     
@@ -31,5 +31,5 @@ def save_bed(df:pd.DataFrame, out:str) -> None:
     """
     df.to_csv(out, sep="\t", index=False, header=False)
     with open(out+".header", 'w') as f:
-        f.write("\n".join(list(df.columns)))
+        f.write("\n".join(list(df.columns)) + "\n")
     return
