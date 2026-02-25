@@ -1,0 +1,28 @@
+name: "Main Docs Publication"
+
+on:
+  push:
+    branches: [ main ]
+  
+jobs :
+  docs :
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone
+      uses: actions/checkout@v1
+
+    - name: Set Up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12.3'
+
+    - name: Build Docs
+      uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "./docs/"
+      
+    - name: Deploy Docs
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: "./docs/build/html"
