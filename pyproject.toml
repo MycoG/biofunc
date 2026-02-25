@@ -21,11 +21,15 @@ test = [
     "pytest >=  9.0.2",
     "pytest-cov"
 ]
-doc = ["sphinx"]
+doc = [
+    "sphinx",
+    "shibuya"
+    ]
 full = [
     "pytest >=  9.0.2",
     "pytest-cov",
-    "sphinx"
+    "sphinx",
+    "shibuya"
 ]
 
 [project.urls]
