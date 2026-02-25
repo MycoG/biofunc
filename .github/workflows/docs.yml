@@ -16,7 +16,7 @@ jobs:
       with:
         python-version: '3.12.3'
 
-    - run: python3 -m pip install biofunc
+    - run: python3 -m pip install ".[doc]"
 
     - name: Build Docs
       uses: ammaraskar/sphinx-action@master
