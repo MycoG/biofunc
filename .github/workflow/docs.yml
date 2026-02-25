@@ -1,4 +1,4 @@
-name: "Main Docs Publication"
+name: "main Docs Publication"
 
 on:
   push:
@@ -16,8 +16,15 @@ jobs:
       with:
         python-version: '3.10'
 
+    - run: python3 -m pip install biofunc
+
+    - name: Build Docs
+      uses: ammaraskar/sphinx-action@master
+      with:
+        docs-folder: "./docs/"
+
     - name: Deploy Docs
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: "./docs/"
+        publish_dir: "./docs/build/html/"
