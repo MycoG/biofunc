@@ -1,3 +1,2 @@
-sphinx
-shibuya
-biofunc
+Sphinx==9.1.0
+shibuya==2026.1.9
