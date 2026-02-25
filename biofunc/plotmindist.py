@@ -12,10 +12,6 @@ import numpy as np
 program_name = "plotmindist"
 description = "plot features according to minimum distance column, and log some summary stats"
 
-#test command:
-# plotmindist.py input_bed cols ranges outname out_dir
-# ./plotmindist.py /home/myco/myco/projects/swifr-hprc-het-check/output/swifrSNP-hprcSNP-chb+jpt.mindist.bed out_test /home/myco/myco/scripts/mindist_scripts/test/pltmindist
-
 def _plot(df:pd.DataFrame, 
           x:str, 
           y:str, 

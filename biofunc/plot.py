@@ -3,8 +3,6 @@ from matplotlib.axes import Axes
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-
 def plot_hmean(
         df, 
         col, 
@@ -87,48 +85,6 @@ def plot_interp_mean(
         plt.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
 
     return
-
-#WIP
-def plot_density(
-        df: pd.DataFrame,
-        x: str,
-        window_size=11,
-        ax: Axes = None,
-        ):
-    """
-    If there
-
-    :param:
-    """
-    data = df.copy().sort_values(x)
-    
-    #groupby the x value, first
-    groupby = data.groupby(x).size()
-    xvals = groupby.index.to_list()
-    yvals = groupby.to_list()
-    
-    ax.plot(xvals, yvals)
-
-    # #create new points in between min and max
-    xmin, xmax = np.min(xvals), np.max(xvals)
-    len_xrange = np.abs(xmin) + np.abs(xmax) + 1
-    xnew = np.linspace(xmin, xmax, len_xrange)
-    # ynew = np.interp(xnew, xvals, yvals)
-
-    # #create new dataframe using xnew and ynew
-    # df = pd.DataFrame({"x": xnew, "y": ynew})
-
-    # #get rolling mean
-    # rolling_mean = df.rolling(window_size, center=True)['y'].mean()
-
-    # #plot
-    # if ax != None:
-    #     ax.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
-    # else:
-    #     plt.plot(df['x'], rolling_mean, label=f"interp mean w={window_size}")
-
-    return
-
 
 def plot_mindist(df: pd.DataFrame, col:str, out:str=None,
                 range:int=50_000, 

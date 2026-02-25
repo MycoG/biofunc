@@ -12,9 +12,6 @@ import os
 program_name = "abmindist"
 description = "calculate minimum distance between two BED files"
 
-#test command:
-# python ./abmindist.py test/abmindist/afile.bed test/abmindist/bfile.bed out_test test/abmindist/outdir/
-
 def abmindist(A_bed:str, B_bed:str, out_name:str, out_dir:str, dist:int=5_000) -> Path:
     """
     Script to generate minimum distance between two BED files
