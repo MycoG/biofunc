@@ -4,6 +4,8 @@ from matplotlib.cm import ScalarMappable
 from matplotlib.axes import Axes
 import pandas as pd
 
+# WIP, please pardong the dust
+
 def plot_karyogram(
         ref: pd.DataFrame,
         df: pd.DataFrame,
@@ -32,8 +34,8 @@ def plot_karyogram(
 
     chrom_order = [f"chr{x}" for x in range(1,23)]
     for idx, chr in enumerate(chrom_order):
-        df = sup_data[sup_data['chr'] == chr]
-        ref = hs1[hs1['NAME'] == chr].iloc[0]
+        # df = data[data['chr'] == chr]
+        # ref = hs1[hs1['NAME'] == chr].iloc[0]
 
         yloc = idx-height/2
 
