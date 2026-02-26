@@ -15,7 +15,9 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Setup Python
-      uses: actions/setup_python@v4
+      uses: actions/setup_python@v6.2.0
+      with:
+        python-version: '3.12.3'
 
     - name: Install Biofunc Doc Dependencies
       run: python -m pip install ".[doc]"
