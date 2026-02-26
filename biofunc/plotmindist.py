@@ -38,11 +38,11 @@ def _plot(df:pd.DataFrame,
         slice:pd.DataFrame = sorted_df[y][ (sorted_df['mindist'] >= x) & (sorted_df['mindist'] < x+window_size) ]
         return slice.mean()
     sorted_df['rolled'] = sorted_df['mindist'].apply(roll_func)
-    ax.plot(sorted_df['mindist'], sorted_df['rolled'], label=f"new - window={window_size}bp", color="green")
+    ax.plot(sorted_df['mindist'], sorted_df['rolled'], label=f"window={window_size}bp", color="green")
 
     #plot rolling mean by mindist
-    rolling_df = sorted_df[["mindist",y]].rolling(window_size, center=True, on="mindist").mean()
-    ax.plot(rolling_df["mindist"], rolling_df[y], label=f"original - window={window_size}", color="red")
+    # rolling_df = sorted_df[["mindist",y]].rolling(window_size, center=True, on="mindist").mean()
+    # ax.plot(rolling_df["mindist"], rolling_df[y], label=f"original - window={window_size}", color="red")
     
 
     #config
@@ -56,7 +56,7 @@ def _plot(df:pd.DataFrame,
 
     #save figure
     fig.savefig(outfile)
-
+    plt.close()
     return
 
 def _gen_quant(df:pd.DataFrame, col:str):
@@ -86,7 +86,7 @@ def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str,
     def log_write(str):
         log.write(f"[{datetime.now()}] {str} \n")
     if __name__ == "__main__":
-        log_write(f"COMMAND: {" ".join(sys.argv)}")
+        log_write(f"COMMAND: {' '.join(sys.argv)}")
 
     #check if input bed is valid
     input_bed:Path = Path(input_bed)
@@ -115,7 +115,7 @@ def mindist_plot(input_bed:str, cols:str, ranges:str, out_name:str, out_dir:str,
         ("low-0.01", f"{quant_col}<={low_qval:.4f}", low_df),
         ("mid-0.98", f"{low_qval:.3f}<{quant_col}<{high_qval:.4f}", mid_df),
         ("top-0.01", f"{quant_col}>={high_qval:4f}", high_df),
-        ("all", f"all qval", bedfile.sample(len(mid_df)))
+        ("all", f"all {quant_col} values", bedfile.sample(len(mid_df)))
     ]
     
     #plot by each quantile, column, and range
@@ -199,16 +199,16 @@ def parse_args() -> argparse.Namespace:
         prog=program_name,
         description=description
     )
-    parser.add_argument("input_BED")
-    parser.add_argument("out_name")
-    parser.add_argument("out_dir")
+    parser.add_argument("input_BED", help="A BED file, with associated .header file containing a list of columns contained in the BED file, separated by newlines")
+    parser.add_argument("out_name", help="")
+    parser.add_argument("out_dir", help="output directory")
 
     #optional args - if not set the program asks interactively
     parser.add_argument("-c", "--cols", help="comma-separated list of columns to plot")
     parser.add_argument("-r", "--ranges", help="comma-separated list of ranges to plot")
-    parser.add_argument("-l", "--label")
+    parser.add_argument("-l", "--label", help="title that is added to generated plots. ")
     parser.add_argument("-w", "--rolling_window", help="rolling window size (in bp)", default=50)
-    parser.add_argument("-q", "--quantile_column", default="calibrated_smoothed P(sweep)")
+    parser.add_argument("-q", "--quantile_column", default="calibrated_smoothed P(sweep)", help="column to calculate quantiles from")
     return parser.parse_args()
 
 def main():

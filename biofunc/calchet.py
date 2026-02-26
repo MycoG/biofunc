@@ -1,6 +1,7 @@
 from pysam import VariantFile, VariantRecord
 from typing import Tuple
 from argparse import ArgumentParser
+import numpy as np
 
 program_name = "calchet"
 description = "calculate observed and expected heterozygosity per variant in VCF"
@@ -16,6 +17,7 @@ def calchet(input_vcf, output_bed):
             start = rec.start
             stop = rec.stop
             
+            #maybe parallelize this?
             het_obs, het_est = _calchet_record(rec)
 
             format = [chrom, start, stop, het_obs, het_est]
@@ -23,7 +25,7 @@ def calchet(input_vcf, output_bed):
 
     #write header
     with open(str(output_bed)+".header", 'w') as f:
-        f.write("chrom\nstart\nstop\nO(Het)\nE(Het)")
+        f.write("chrom\nstart\nstop\nO(Het)\nE(Het)\n")
 
     return
 
@@ -53,6 +55,9 @@ def _calchet_record(rec:VariantRecord) -> Tuple[float, float]:
         allele_dict[ str(a1) ] += 1
         allele_dict[ str(a2) ] += 1
         num_indiv += 1
+
+    if num_indiv == 0:
+        return (np.nan, np.nan)
 
     het_obs = num_het / num_indiv
 
