@@ -6,24 +6,81 @@ class VCF():
     def __init__(self, path:str, compressed:bool=False):
         self.path:str = path
         self.compressed:bool = compressed
+        self.samples: list
+        self._len : int = 0
+
+        self._META = {}
+        self
 
         input_file = gzip.open(path, 'rt') if self.compressed else open(path, 'r')
         for line in input_file:
             line : str
             if line.startswith("##"):
                 line = line.removeprefix("##")
-                self._handle_header(line)
-            elif line.startswith("#"):
-                line = line.removeprefix("#")
                 self._handle_meta(line)
+                self._len -= 1
+            elif line.startswith("#"):
+                line = line.removeprefix("#").strip().split("\t")
+                self._handle_header(line)
+                self._len -= 1
             else:
-                break
+                self._len += 1
         input_file.close()
 
-    def _handle_header(self, line):
+    @property
+    def len(self):
+        """number of variants within the VCF file"""
+        return self._len
+
+    def _handle_header(self, cols:list):
+        #first 8 columns should always be the same - CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO
+        #columns 9 is FORMAT, so col 10 and beyond must be sample data
+        try:
+            self.samples = cols[9:]
+        except IndexError:
+            self.samples = None
+
+    def _handle_meta(self, line:str):
+        # file format
+        if line.startswith("file"):
+            pass
+        # INFO fields
+        if line.startswith("INF"):
+            line = line.removeprefix("INFO=")
+        # Filter fields
+        if line.startswith("FIL"):
+            line = line.removeprefix("FILTER=")
+        # Individual Format
+        if line.startswith("FOR"):
+            line = line.removeprefix("FORMAT=")
+        # Alternative allele
+        if line.startswith("ALT"):
+            line = line.removeprefix("FORMAT=")
+        # assembly field
+        if line.startswith("ass"):
+            pass 
+        # contig field
+        if line.startswith("con"):
+            line = line.removeprefix("contig=")
+        # sample field
+        if line.startswith("SAM"):
+            line = line.removeprefix("SAMPLE=")
+        # pedigree
+        if line.startswith("PEDIGREE="):
+            line = line.removeprefix("PEDIGREE")
+        if line.startswith("pedigreeDB"):
+            line = line.removeprefix("pedigreeDB")
+        pass
+    
+    def _handle_INFO(line):
+        #types can be int, float, flag, char, string
+        #also special cases
         pass
 
-    def _handle_meta(self, line):
+    def _handle_url_fmt() -> dict:
+        pass 
+
+    def _handle_xml_fmt() -> dict:
         pass
 
     def __iter__(self):
@@ -82,3 +139,17 @@ class Record():
         # return gt_array
     
         return
+
+if __name__ =="__main__":
+    import time
+    start_time = time.time()
+
+    vcf = VCF("top50_000.vcf")
+    # vcf = VCF("hprc-v2.0-mc-chm13.wave.year1.snps.vcf.gz", compressed=True)
+    print(vcf.len)
+
+    # for rec in vcf:
+    #     print(rec.CHROM, rec.POS, rec.ID)
+
+    end_time = time.time()
+    print(f"took {end_time - start_time:.2f}s")

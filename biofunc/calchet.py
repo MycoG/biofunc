@@ -104,7 +104,7 @@ def _calc_het_line(line:str):
 
 def _parse_INFO(info_col:str) -> dict[str,list[str]]:
     info_lst:list = info_col.split(";")
-    info_kv_pairs = [ x.split("=") for x in info_lst ]
+    info_kv_pairs:list = [ x.split("=") for x in info_lst ]
     return {k:v.split(",") for k,v in info_kv_pairs}
 
 def _validate_input(input_vcf, output_dir, output_bed, log_path):
