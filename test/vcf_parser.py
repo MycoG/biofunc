@@ -1,6 +1,6 @@
 import gzip
 from pathlib import Path
-from typing import Tuple
+from typing import Tuple, List
 
 class VCF():
     def __init__(self, path:str, compressed:bool=False):
@@ -10,7 +10,14 @@ class VCF():
         self._len : int = 0
 
         self._META = {}
-        self
+        self.PEDIGREE : List[dict] = []
+        self.SAMPLE : List[dict] = []
+        self.CONTIG : dict = {}
+        self.PEDIGREE_DB = None
+        self.ALT : List[dict] = []
+        self.FORMAT : dict = {}
+        self.INFO : dict = {}
+        self.FILTER : dict = {}
 
         input_file = gzip.open(path, 'rt') if self.compressed else open(path, 'r')
         for line in input_file:
@@ -41,47 +48,90 @@ class VCF():
             self.samples = None
 
     def _handle_meta(self, line:str):
+        line = line.strip()
         # file format
         if line.startswith("file"):
             pass
         # INFO fields
         if line.startswith("INF"):
             line = line.removeprefix("INFO=")
+            line_dict = self._handle_xml_fmt(line)
+            id = line_dict.pop("ID")
+            self.INFO[id] = line_dict
         # Filter fields
         if line.startswith("FIL"):
             line = line.removeprefix("FILTER=")
+            line_dict = self._handle_xml_fmt(line)
+            id = line_dict.pop("ID")
+            self.FILTER[id] = line_dict
         # Individual Format
         if line.startswith("FOR"):
             line = line.removeprefix("FORMAT=")
+            line_dict = self._handle_xml_fmt(line)
+            id = line_dict.pop("ID")
+            self.FORMAT[id] = line_dict
         # Alternative allele
         if line.startswith("ALT"):
-            line = line.removeprefix("FORMAT=")
+            line = line.removeprefix("ALT=")
+            self.ALT.append(self._handle_xml_fmt(line))
         # assembly field
         if line.startswith("ass"):
-            pass 
+            self.ASSEMBLY = line.removeprefix("assembly=")
         # contig field
         if line.startswith("con"):
             line = line.removeprefix("contig=")
+            line_dict = self._handle_xml_fmt(line)
+            id = line_dict.pop("ID")
+            self.CONTIG[id] = line_dict
         # sample field
         if line.startswith("SAM"):
             line = line.removeprefix("SAMPLE=")
+            self.SAMPLE.append(self._handle_xml_fmt(line))
         # pedigree
         if line.startswith("PEDIGREE="):
-            line = line.removeprefix("PEDIGREE")
+            line = line.removeprefix("PEDIGREE=")
+            self.PEDIGREE.append(self._handle_xml_fmt(line))
         if line.startswith("pedigreeDB"):
-            line = line.removeprefix("pedigreeDB")
-        pass
-    
-    def _handle_INFO(line):
-        #types can be int, float, flag, char, string
-        #also special cases
+            line = line.removeprefix("pedigreeDB=")
+            self.PEDIGREE_DB = line
         pass
 
-    def _handle_url_fmt() -> dict:
-        pass 
+    def _handle_url_fmt(self, line) -> Tuple[str, str]:
+        key, url = line.split("=")
+        return key, url
 
-    def _handle_xml_fmt() -> dict:
-        pass
+    def _handle_xml_fmt(self, line) -> dict[str, str]:
+        """
+        Converts the XML-like format of VCF meta lines into a python Dictionary of strings
+        example:  
+        ```
+        <
+            ID=ID,
+            Number=number,
+            Type=type,
+            Description="description",
+            Source="source",
+            Version="version"
+        >
+        ```
+        is turned into  
+        ```
+        {  
+            "ID": "ID",  
+            "Number":"number",  
+            "Type":"type",  
+            "Description": "description",  
+            "Source", "source",  
+            "Version":"version  
+        }
+        ```  
+        """
+        print(line)
+        fmt_line = line.strip("<>").split(",") #TODO: This causes commas within descriptions to be split, as well. Gotta change this...
+        fmt_line = [x.split("=", maxsplit=1) for x in fmt_line]
+        print(fmt_line)
+        fmt_dict = {k:v.strip("\"") for k,v in fmt_line}
+        return fmt_dict
 
     def __iter__(self):
         """loop over VCF records"""
