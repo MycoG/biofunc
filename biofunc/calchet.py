@@ -42,8 +42,14 @@ def calc_het(input_vcf, output_bed, output_dir, compressed=False):
         #calculate het
         else:
             line=line.split("\t")
+            INFO = _parse_INFO(line[7])
+            CHROM = line[0]
+            POS = line[1]
+            END = INFO.get("END", POS)
+            START =  str(int(POS)-1)              #BED files are 0-based, half open and VCF are 1-based
+
             het_obs, het_est = _calc_het_line(line)
-            output_file.write("\t".join([ str(t) for t in line[:2] ] + [str(line[1])] + [str(het_obs), str(het_est)]) + "\n")
+            output_file.write("\t".join([ CHROM, START, END, str(het_obs), str(het_est)]) + "\n")
 
     input_file.close()
     output_file.close()
@@ -95,6 +101,11 @@ def _calc_het_line(line:str):
     het_est = 1 - (est_hom / ( 2 * valid_samples ) ** 2 )       # est_heterozygosity = (1 - est homozygosity)
     
     return het_obs, het_est
+
+def _parse_INFO(info_col:str) -> dict[str,list[str]]:
+    info_lst:list = info_col.split(";")
+    info_kv_pairs = [ x.split("=") for x in info_lst ]
+    return {k:v.split(",") for k,v in info_kv_pairs}
 
 def _validate_input(input_vcf, output_dir, output_bed, log_path):
 
