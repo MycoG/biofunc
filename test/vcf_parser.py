@@ -1,5 +1,6 @@
 import gzip
 from pathlib import Path
+import csv
 from typing import Tuple, List
 
 class VCF():
@@ -100,7 +101,7 @@ class VCF():
         key, url = line.split("=")
         return key, url
 
-    def _handle_xml_fmt(self, line) -> dict[str, str]:
+    def _handle_xml_fmt(self, line:str) -> dict[str, str]:
         """
         Converts the XML-like format of VCF meta lines into a python Dictionary of strings
         example:  
@@ -126,12 +127,10 @@ class VCF():
         }
         ```  
         """
-        print(line)
-        fmt_line = line.strip("<>").split(",") #TODO: This causes commas within descriptions to be split, as well. Gotta change this...
-        fmt_line = [x.split("=", maxsplit=1) for x in fmt_line]
-        print(fmt_line)
-        fmt_dict = {k:v.strip("\"") for k,v in fmt_line}
-        return fmt_dict
+        fmt_line = line.strip("<>")
+        row = next( csv.reader([fmt_line]) ) # convert string to list, skipping commas inside quotes
+        kv_tuples = [x.partition("=")[::2] for x in row]
+        return {k:v.strip('"') for k,v in kv_tuples} # convert list to dictionary
 
     def __iter__(self):
         """loop over VCF records"""
@@ -189,17 +188,3 @@ class Record():
         # return gt_array
     
         return
-
-if __name__ =="__main__":
-    import time
-    start_time = time.time()
-
-    vcf = VCF("top50_000.vcf")
-    # vcf = VCF("hprc-v2.0-mc-chm13.wave.year1.snps.vcf.gz", compressed=True)
-    print(vcf.len)
-
-    # for rec in vcf:
-    #     print(rec.CHROM, rec.POS, rec.ID)
-
-    end_time = time.time()
-    print(f"took {end_time - start_time:.2f}s")
