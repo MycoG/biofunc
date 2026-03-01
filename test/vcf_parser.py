@@ -141,7 +141,10 @@ class VCF():
                 yield Record(line)
 
 class Record():
+    
+
     def __init__(self, line:list):
+        #record default properties
         self.CHROM:str = line[0]
         self.POS:str = line[1]
         self.ID:str = line[2]
@@ -149,13 +152,32 @@ class Record():
         self.ALT:str = line[4]
         self.QUAL:str = line[5]
         self.FILTER:str = line[6]
-        self.INFO:list = self._parse_INFO(line[7])
+
+        #lazy load properties
+        self._info_line = line[7]
+        self._format_line = line[8]
+        self._gt_line = line[9:]
+    
+    @property
+    def INFO(self) -> dict[str, list[str]]:
+        """Only parse INFO on request"""
+        return self._parse_INFO(self._info_line)
+
+    @property
+    def FORMAT(self):
+        """Only parse FORMAT field on request"""
         try :
-            self.FORMAT = self._parse_FORMAT(line[8])
-            self.GT = self._parse_GT(line[9:])
-        except IndexError:
-            self.FORMAT = None
-            self.GT = None
+            return self._parse_FORMAT(self._format_line)
+        except :
+            return None
+
+    @property
+    def GT_fields(self) -> None | dict :
+        """Only parse GT fields on request"""
+        if self.FORMAT == None:
+            return None
+        else :
+            return self._parse_GT_field(self._gt_line)
 
     def _parse_INFO(self, info_col:str) -> dict[str,list[str]]:
         """Parses INFO column and returns dictionary"""
@@ -167,24 +189,69 @@ class Record():
         """parses format column"""
         line = fmt_line.split(":")
         if type(line) == list:
-            return {k:v for k,v in enumerate(line)}
+            return {gt_type:idx for idx,gt_type in enumerate(line)}
         else:
             return {line:0}                             #handle cases where there is only one field
     
-    #TODO redo this because genotype can be filled with multiple sub fields
-    def _parse_GT(self, gt_cols:list[str]) -> list[Tuple[int, int, bool]]:
-        """
-        parses GT columns and returns List of Tuples with format (allele:int, allele:int, ... ,  phased?:bool)  
-        missing genotypes are indicated as -1
-        """
-        # gt_array = []
-        # phased = False
-        # for col in gt_cols:
-        #     col :str 
-        #     phased = True if col[1] == "|" else False                           #check if phased
-        #     alleles:list = col.split("|") if phased else col.split("/")         #split each genotype into alleles
-        #     alleles = [ int(x) if x.isdigit() else -1 for x in alleles ]        #convert alleles into ints
-        #     gt_array.append(alleles + [phased])
-        # return gt_array
+    def _parse_GT_field(self, gt_cols:list[str]) -> dict:
+        if self.FORMAT == None:
+            return None
+        else :
+            gt_fields = {}
+            # loop over format indices
+            for gt_keyword, idx in self.FORMAT.items():
+                
+                if len(self.FORMAT) == 1:
+                    #if only 1 format field, gt_cols is a 1d array so we can pass it as the arg
+                    gt_fields = self._handle_GT_field(gt_keyword, gt_cols)
+                else:
+                    # gt_cols is a 2d array so we need to extract only the field we want
+                    gt_keyword_field = [x[idx] for x in gt_cols] 
+                    gt_fields[gt_keyword] = self._handle_GT_field(gt_keyword, gt_keyword_field)
+                    
+        return gt_fields
     
-        return
+
+
+    @staticmethod
+    def _handle_gt(gt_cols:list[str]) -> list[list[int|bool]]:
+        """
+        Return alleles per sample + phasing as format:  
+        [a1(str), a2(str), ..., phase(bool)]
+        """
+        return [x.split(x[1])+[True] if x[1] == "|" else x.split(x[1])+[False] for x in gt_cols]
+
+    # TODO
+    @staticmethod
+    def _handle_ft(gt_cols:list[str]):
+        pass
+    
+    @staticmethod
+    def _handle_list_type(type=str):
+        """
+        Return function that converts list into selected type
+        """
+        def _handle_list(gt_cols:list[str]):
+            if gt_cols[0] == ".":
+                return None
+            return [type(x) for x in gt_cols]
+        return _handle_list
+    
+    _gt_keyword_handler = {
+            "GT": _handle_gt,
+            "DP": _handle_list_type(int),
+            "FT": _handle_ft,
+            "GL": _handle_list_type(float),
+            "GLE": _handle_list_type(str), #double check if its list of strings bc docs give GLE=0:... as example
+            "PL": _handle_list_type(int),
+            "GP": _handle_list_type(float),
+            "GQ": _handle_list_type(int),
+            "HQ": _handle_list_type(int),
+            "PS": _handle_list_type(int),
+            "PQ": _handle_list_type(int),
+            "EC": _handle_list_type(int),
+            "MQ": _handle_list_type(int),
+    }
+
+    def _handle_GT_field(self, gt_keyword:str, gt_cols:list[str]):
+        return self._gt_keyword_handler[gt_keyword](gt_cols)
