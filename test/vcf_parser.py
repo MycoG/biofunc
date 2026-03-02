@@ -175,13 +175,13 @@ class Record():
     
 
     def __init__(self, line:list):
-        #record default properties
+        #fixed fields
         self.CHROM:str = line[0]
-        self.POS:str = line[1]
+        self.POS:str = int(line[1])
         self.ID:str = line[2]
         self.REF:str = line[3]
-        self.ALT:str = line[4]
-        self.QUAL:str = line[5]
+        self.ALT:List[str] = line[4].split(",") if "," in line[4] else line[4]
+        self.QUAL:str = int(line[5])
         self.FILTER:str = line[6]
 
         #lazy load properties
