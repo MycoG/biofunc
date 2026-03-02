@@ -1,0 +1,37 @@
+biofunc
+
+
+code :
+	vcf
+		- add proper documentation for public properties
+			- add extra properties for BED formatting, like POS0 or START0, etc…
+		- add generator splitting capability
+		- add proper bgzip file parsing with index files
+
+		- ensure that VCF formatting is correct for all fields - and validate for VCF 4.2
+	bed
+		- add options for importing with default bed format headers ( if headers aren’t there or in a file)
+
+	check_align
+	
+	abmindist - separate mindist code from cmd script
+	calchet - separate calchet code from cmd script
+	pltmindist - 
+
+documentation:
+	index
+		- add VCF, bed, and mindist
+
+	vcf
+		- add foreword to VCF, benefits and detriments for using it
+
+	bed
+	
+	command line:
+		abmindist
+		calchet
+		plotmindist
+
+extra:
+	try cython to see if we can have any performance improvements
+	
