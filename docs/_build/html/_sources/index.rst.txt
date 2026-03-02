@@ -17,4 +17,8 @@ my first python package ever, so please pardon some sloppiness at the moment.
    :maxdepth: 2
    :caption: Contents:
    
-   bed
+   pages/install
+   pages/vcf
+   pages/bed
+   
+   

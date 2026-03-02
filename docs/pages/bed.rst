@@ -1,4 +1,4 @@
-biofunc.bed
+bed
 ===========
 
 .. autofunction:: biofunc.bed.load_bed
