@@ -1,4 +1,4 @@
 biofunc/__pycache__
 .venv
 **__pycache__
-docs/_build/*
+docs/_build/
