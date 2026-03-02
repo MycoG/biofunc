@@ -1,4 +1,4 @@
-from vcf_parser import Record
+from biofunc.vcf import Record
 
 record_line_gt = "chr10	2	>13041>13046_1	T	A,TCCCTCAC	60	.	AC=1,1;AF=0.0217391,0.0217391;AN=7;NS=232;LV=0;ORIGIN=chr10:1;LEN=1,7;TYPE=snp,ins	GT	.|0	.|.	.|.	.|.	.|.	0|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|0	.|.	.|.	.|.	.|.	2|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	0|.	.|1	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	.|.	0|.	.|.	.|.	.|.	.|."
 record_line_gt = record_line_gt.strip().split("\t")

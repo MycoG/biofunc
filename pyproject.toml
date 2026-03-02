@@ -8,7 +8,7 @@ dependencies = [
     "scikit-allel",
     "pysam", 
     "scipy",
-    "cyvcf2=0.32.1",
+    "cyvcf2",
 ]
 requires-python = ">=3.12.3"
 authors = [
