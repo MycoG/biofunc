@@ -5,8 +5,10 @@ Installation
 Installing with pip
 ===================
 
+.. note::
+    This project hasn't been uploaded to PYPI yet.
+
 .. code-block:: bash
-    :caption: The package hasn't been uploaded to PYPI yet
 
     pip install biofunc
 
