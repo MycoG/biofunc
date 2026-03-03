@@ -10,15 +10,16 @@ class VCF():
         self.samples: list
         self._len : int = 0
 
-        self._META = {}
-        self.PEDIGREE : List[dict] = []
-        self.SAMPLE : List[dict] = []
-        self.CONTIG : dict = {}
-        self.PEDIGREE_DB = None
-        self.ALT : List[dict] = []
-        self.FORMAT : dict = {}
-        self.INFO : dict = {}
-        self.FILTER : dict = {}
+        #TODO: convert these into properties
+        # self._META = {}
+        # self.PEDIGREE : dict = {}
+        # self.SAMPLE : dict = {}
+        # self.CONTIG : dict = {}
+        # self.PEDIGREE_DB = None
+        # self.ALT : dict = {}
+        # self.FORMAT : dict = {}
+        # self.INFO : dict = {}
+        # self.FILTER : dict = {}
 
         input_file = gzip.open(self._path, 'rt') if self._compressed else open(self._path, 'r')
         for line in input_file:
@@ -56,71 +57,14 @@ class VCF():
 
     #region -------------------------- META-INFO PARSERS -------------------------- 
 
-    # TODO reformat this to reduce repeated code
-    def _handle_meta(self, line:str):
-        line = line.strip()
-        # file format
-        if line.startswith("file"):
-            pass
 
-        # INFO fields
-        if line.startswith("INF"):
-            line = line.removeprefix("INFO=")
-            line_dict = self._handle_xml_fmt(line)
-            id = line_dict.pop("ID")
-            self.INFO[id] = line_dict
-
-        # Filter fields
-        if line.startswith("FIL"):
-            line = line.removeprefix("FILTER=")
-            line_dict = self._handle_xml_fmt(line)
-            id = line_dict.pop("ID")
-            self.FILTER[id] = line_dict
-
-        # Individual Format
-        if line.startswith("FOR"):
-            line = line.removeprefix("FORMAT=")
-            line_dict = self._handle_xml_fmt(line)
-            id = line_dict.pop("ID")
-            self.FORMAT[id] = line_dict
-
-        # Alternative allele
-        if line.startswith("ALT"):
-            line = line.removeprefix("ALT=")
-            self.ALT.append(self._handle_xml_fmt(line))
-
-        #TODO assembly field
-        if line.startswith("ass"):
-            self.ASSEMBLY = line.removeprefix("assembly=")
-
-        # contig field
-        if line.startswith("con"):
-            line = line.removeprefix("contig=")
-            line_dict = self._handle_xml_fmt(line)
-            id = line_dict.pop("ID")
-            self.CONTIG[id] = line_dict
-
-        # sample field
-        if line.startswith("SAM"):
-            line = line.removeprefix("SAMPLE=")
-            self.SAMPLE.append(self._handle_xml_fmt(line))
-
-        # pedigree
-        if line.startswith("PEDIGREE="):
-            line = line.removeprefix("PEDIGREE=")
-            self.PEDIGREE.append(self._handle_xml_fmt(line))
-
-        if line.startswith("pedigreeDB"):
-            line = line.removeprefix("pedigreeDB=")
-            self.PEDIGREE_DB = line
-        pass
-    
-
-    def _handle_url_fmt(self, line) -> Tuple[str, str]:
+    @staticmethod
+    def _handle_url_fmt(line) -> Tuple[str, str]:
         key, url = line.split("=")
         return key, url
 
-    def _handle_xml_fmt(self, line:str) -> dict[str, str]:
+    @staticmethod
+    def _handle_xml_fmt(line:str) -> dict[str, str]:
         """
         Converts the XML-like format of VCF meta lines into a python Dictionary of strings
         example:  
@@ -150,6 +94,70 @@ class VCF():
         row = next( csv.reader([fmt_line]) ) # convert string to list, skipping commas inside quotes
         kv_tuples = [x.partition("=")[::2] for x in row]
         return {k:v.strip('"') for k,v in kv_tuples} # convert list to dictionary
+
+
+    def _handle_xml(self, line:str, attr_name):
+        attr_name = VCF._handle_xml_fmt(line)
+
+    def _handle_id_fmt(self, line:str, attr_name:str):
+        """
+        Handles xml-like formats with a known ID field  
+        Returns Tuple of ID:str and Dictionary
+        """
+        fmt_dict = VCF._handle_xml_fmt(line)
+        id = fmt_dict.pop("ID")
+        attr = getattr(self, attr_name, None)
+        if attr == None:
+            setattr(self, attr_name, {id:fmt_dict})
+        else:
+            attr[id] = fmt_dict
+
+    # TODO edit because there can be multiple IDs
+    def _handle_alt(self, line:str, attr_name:str):
+        """ALT fields ID's can be colon separated"""
+        fmt_dict = VCF._handle_xml_fmt(line)
+        id = fmt_dict.pop("ID")
+        attr = getattr(self, attr_name, None)
+        if attr == None:
+            setattr(self, attr_name, {id:fmt_dict})
+        else:
+            print(id)
+            print(attr_name)
+            attr[id] = fmt_dict
+    
+    def _handle_line(self, line:str, attr_name):
+        attr = getattr(self, attr_name, None)
+        if attr == None:
+            setattr(self, attr_name, line)
+        else:
+            attr = line 
+
+
+    # this dict returns functions to how VCF4.2 reserved metainfo should be handled
+    metainfo_dict = {
+        "fileformat":_handle_line,
+        "INFO": _handle_id_fmt,
+        "FILTER":_handle_id_fmt,
+        "FORMAT":_handle_id_fmt,
+        "ALT":_handle_alt,
+        "assembly":_handle_line,
+        "contig":_handle_id_fmt,
+        "SAMPLE":_handle_id_fmt,
+        "PEDIGREE":_handle_xml,
+        "pedigreeDB":_handle_line,
+        "default":_handle_line
+    }
+
+    # TODO reformat this to reduce repeated code
+    def _handle_meta(self, line:str):
+        pre_sep, sep, post_sep = line.strip().partition("=")
+        # run the specific function from metainfo_dict
+        try :
+            meta_func = self.metainfo_dict[pre_sep]
+        except KeyError :
+            meta_func = self.metainfo_dict["default"]
+        meta_func(self=self, line=post_sep, attr_name=pre_sep)
+
 
     #endregion
 

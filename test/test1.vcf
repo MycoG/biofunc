@@ -1,0 +1,13 @@
+##fileformat=VCFv4.2
+##INFO=<ID=ID,Number=number,Type=type,Description="description",Source="source",Version="version">
+##FILTER=<ID=ID,Description="description">
+##FORMAT=<ID=ID,Number=number,Type=type,Description="description">
+##ALT=<ID=type,Description="description">
+##INFO=<ID=ID,Number=number,Type=type,Description="description",Source="description",Version="128">
+##assembly=url
+##contig=<ID=ctg1,URL=ftp://somewhere.org/assembly.fa>
+##SAMPLE=<ID=S_ID,Genomes=G1_ID;G2_ID;GK_ID,Mixture=N1;N2;NK,Description=S1;S2;SK>
+##PEDIGREE=<Name_0=G0-ID,Name_1=G1-ID,Name_N=GN-ID
+##pedigreeDB=URL
+##bcftools_viewVersion=1.19+htslib-1.19
+#CHROM  POS ID  REF ALT QUAL    FILTER  INFO
