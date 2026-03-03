@@ -10,17 +10,6 @@ class VCF():
         self.samples: list
         self._len : int = 0
 
-        #TODO: convert these into properties
-        # self._META = {}
-        # self.PEDIGREE : dict = {}
-        # self.SAMPLE : dict = {}
-        # self.CONTIG : dict = {}
-        # self.PEDIGREE_DB = None
-        # self.ALT : dict = {}
-        # self.FORMAT : dict = {}
-        # self.INFO : dict = {}
-        # self.FILTER : dict = {}
-
         input_file = gzip.open(self._path, 'rt') if self._compressed else open(self._path, 'r')
         for line in input_file:
             line : str
@@ -37,6 +26,93 @@ class VCF():
         input_file.close()
 
     #region -------------------------- PROPERTIES -------------------------- 
+    @property
+    def fileformat(self):
+        "VCF format version number"
+        return getattr(self, "_fileformat", None)
+
+    # TODO:
+    @property
+    def INFO(self) -> dict | None:
+        ""
+        return getattr(self, "_INFO", None)
+    
+    @property
+    def FILTER(self) -> dict[str,dict] | None:
+        """
+        Filters that have been applied to the data  
+        Returned in format :
+        
+        {  
+            "ID":  {  "Description":  "desc"  },  
+            "ID2": {  "Description":  "desc"  },  
+            ...
+        }
+        """
+        return getattr(self, "_FILTER", None)
+    
+    @property
+    def FORMAT(self) -> dict[str, dict] | None:
+        """
+        Genotype field specifications  
+        Returned in format :  
+
+        {
+            "ID" : {
+                    "Number":  "number",
+                    "Type": "type",
+                    "Description": "desc"
+                    },
+            "ID2" : {
+                    "Number":  "number",
+                    "Type": "type",
+                    "Description": "desc"
+                    },
+        }
+        """
+        return getattr(self, "_FORMAT", None)
+    
+    # TODO:
+    @property
+    def ALT(self):
+        ""
+        return getattr(self, "_ALT", None)
+    
+    @property
+    def assembly(self) -> str | None:
+        """
+        URL field that specifies location of a fasta file containing breakpoint assemblies
+        referenced in the VCF records for structural variants via the BKPTID INFO key.
+        """
+        return getattr(self, "_assembly", None)
+    
+    @property
+    def contig(self) -> dict[str, dict] | None :
+        """
+        Description of contigs referred to in the VCF file
+        """
+        return getattr(self, "_contig", None)
+    
+    @property
+    def SAMPLE(self):
+        """
+        Sample Genotype Mappings
+        """
+        return getattr(self, "_SAMPLE", None)
+    
+    @property
+    def PEDIGREE(self) -> dict | None:
+        """
+        Relationships Between genoomes
+        """
+        return getattr(self, "_PEDIGREE", None)
+    
+    @property
+    def pedigreeDB(self) -> str | None:
+        """
+        Link to database of relationships between genomes
+        """
+        return getattr(self, "_pedigreeDB", None)
 
     @property
     def len(self):
@@ -95,10 +171,16 @@ class VCF():
         kv_tuples = [x.partition("=")[::2] for x in row]
         return {k:v.strip('"') for k,v in kv_tuples} # convert list to dictionary
 
-
+    @staticmethod
     def _handle_xml(self, line:str, attr_name):
-        attr_name = VCF._handle_xml_fmt(line)
+        attr = getattr(self, attr_name, None)
+        info = VCF._handle_xml_fmt(line)
+        if attr == None:
+            setattr(self, attr_name, info)
+        else :
+            attr = info
 
+    @staticmethod
     def _handle_id_fmt(self, line:str, attr_name:str):
         """
         Handles xml-like formats with a known ID field  
@@ -112,6 +194,7 @@ class VCF():
         else:
             attr[id] = fmt_dict
 
+    @staticmethod
     # TODO edit because there can be multiple IDs
     def _handle_alt(self, line:str, attr_name:str):
         """ALT fields ID's can be colon separated"""
@@ -121,17 +204,15 @@ class VCF():
         if attr == None:
             setattr(self, attr_name, {id:fmt_dict})
         else:
-            print(id)
-            print(attr_name)
             attr[id] = fmt_dict
     
+    @staticmethod
     def _handle_line(self, line:str, attr_name):
         attr = getattr(self, attr_name, None)
         if attr == None:
             setattr(self, attr_name, line)
         else:
             attr = line 
-
 
     # this dict returns functions to how VCF4.2 reserved metainfo should be handled
     metainfo_dict = {
@@ -148,17 +229,16 @@ class VCF():
         "default":_handle_line
     }
 
-    # TODO reformat this to reduce repeated code
     def _handle_meta(self, line:str):
         pre_sep, sep, post_sep = line.strip().partition("=")
         # run the specific function from metainfo_dict
         try :
             meta_func = self.metainfo_dict[pre_sep]
+            meta_func(self=self, line=post_sep, attr_name="_"+pre_sep)
         except KeyError :
             meta_func = self.metainfo_dict["default"]
-        meta_func(self=self, line=post_sep, attr_name=pre_sep)
-
-
+            meta_func(self=self, line=post_sep, attr_name=pre_sep)
+        
     #endregion
 
 
@@ -181,7 +261,6 @@ class VCF():
 
 class Record():
     
-
     def __init__(self, line:list):
         #fixed fields
         self.CHROM:str = line[0]

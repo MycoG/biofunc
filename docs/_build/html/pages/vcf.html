@@ -73,7 +73,15 @@ data-aria-dark="Switch to auto color mode">
     </button>
     <div class="sy-scrollbar sy-rside-inner px-6 xl:top-16 xl:sticky xl:pl-0 pt-6 pb-4"><div class="localtoc"><h3>On this page</h3><ul>
 <li><a class="reference internal" href="#biofunc.vcf.VCF"><code class="docutils literal notranslate"><span class="pre">VCF</span></code></a><ul>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.FILTER"><code class="docutils literal notranslate">FILTER</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.FORMAT"><code class="docutils literal notranslate">FORMAT</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.PEDIGREE"><code class="docutils literal notranslate">PEDIGREE</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.SAMPLE"><code class="docutils literal notranslate">SAMPLE</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.assembly"><code class="docutils literal notranslate">assembly</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.contig"><code class="docutils literal notranslate">contig</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.fileformat"><code class="docutils literal notranslate">fileformat</span></code></a></li>
 <li><a class="reference internal" href="#biofunc.vcf.VCF.len"><code class="docutils literal notranslate">len</span></code></a></li>
+<li><a class="reference internal" href="#biofunc.vcf.VCF.pedigreeDB"><code class="docutils literal notranslate">pedigreeDB</span></code></a></li>
 <li><a class="reference internal" href="#biofunc.vcf.VCF.split"><code class="docutils literal notranslate">split()</span></code></a></li>
 </ul>
 </li>
@@ -119,9 +127,83 @@ data-aria-dark="Switch to auto color mode">
 <dt class="sig sig-object py" id="biofunc.vcf.VCF">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">biofunc.vcf.</span></span><span class="sig-name descname"><span class="pre">VCF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#biofunc.vcf.VCF" title="Link to this definition">¶</a></dt>
 <dd><dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.FILTER">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FILTER</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.FILTER" title="Link to this definition">¶</a></dt>
+<dd><p>Filters that have been applied to the data  
+Returned in format :</p>
+<dl class="simple">
+<dt>{  </dt><dd><p>“ID”:  {  “Description”:  “desc”  },  
+“ID2”: {  “Description”:  “desc”  },  
+…</p>
+</dd>
+</dl>
+<p>}</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.FORMAT">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FORMAT</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.FORMAT" title="Link to this definition">¶</a></dt>
+<dd><p>Genotype field specifications  
+Returned in format :</p>
+<dl class="simple">
+<dt>{</dt><dd><dl class="simple">
+<dt>“ID”<span class="classifier">{</span></dt><dd><p>“Number”:  “number”,
+“Type”: “type”,
+“Description”: “desc”
+},</p>
+</dd>
+<dt>“ID2”<span class="classifier">{</span></dt><dd><p>“Number”:  “number”,
+“Type”: “type”,
+“Description”: “desc”
+},</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>}</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.PEDIGREE">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">PEDIGREE</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.PEDIGREE" title="Link to this definition">¶</a></dt>
+<dd><p>Relationships Between genoomes</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.SAMPLE">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SAMPLE</span></span><a class="headerlink" href="#biofunc.vcf.VCF.SAMPLE" title="Link to this definition">¶</a></dt>
+<dd><p>Sample Genotype Mappings</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.assembly">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">assembly</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.assembly" title="Link to this definition">¶</a></dt>
+<dd><p>URL field that specifies location of a fasta file containing breakpoint assemblies
+referenced in the VCF records for structural variants via the BKPTID INFO key.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.contig">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">contig</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.contig" title="Link to this definition">¶</a></dt>
+<dd><p>Description of contigs referred to in the VCF file</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.fileformat">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fileformat</span></span><a class="headerlink" href="#biofunc.vcf.VCF.fileformat" title="Link to this definition">¶</a></dt>
+<dd><p>VCF format version number</p>
+</dd></dl>
+
+<dl class="py property">
 <dt class="sig sig-object py" id="biofunc.vcf.VCF.len">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">len</span></span><a class="headerlink" href="#biofunc.vcf.VCF.len" title="Link to this definition">¶</a></dt>
 <dd><p>number of variants within the VCF file</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="biofunc.vcf.VCF.pedigreeDB">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">pedigreeDB</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#biofunc.vcf.VCF.pedigreeDB" title="Link to this definition">¶</a></dt>
+<dd><p>Link to database of relationships between genomes</p>
 </dd></dl>
 
 <dl class="py method">

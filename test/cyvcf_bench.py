@@ -9,7 +9,7 @@ if __name__ =="__main__":
     
     print("test vcf_parse")
     start_time = time.time()
-    vcf = VCF("top50_000.vcf")
+    vcf = VCF("data/top50_000.vcf")
     with open("test_vcf_parse.bed", 'w') as f:
         for rec in vcf:
             f.write("\t".join([rec.CHROM, rec.POS, rec.ID]) + "\n")
@@ -20,7 +20,7 @@ if __name__ =="__main__":
 
     print("test pysam Variant")
     start_time = time.time()
-    vcf = VariantFile("top50_000.vcf")
+    vcf = VariantFile("data/top50_000.vcf")
     with open("test_vcf_parse.pysam.bed", 'w') as f:
         for rec in vcf.fetch():
             f.write("\t".join([rec.chrom, str(rec.pos), rec.id]) + "\n")
@@ -31,7 +31,7 @@ if __name__ =="__main__":
 
     print("test cyVCF Variant")
     start_time = time.time()
-    vcf = cyvcf2.VCF("top50_000.vcf")
+    vcf = cyvcf2.VCF("data/top50_000.vcf")
     with open("test_vcf_parse.cyvcf2.bed", 'w') as f:
         for rec in vcf:
             f.write("\t".join([rec.CHROM, str(rec.POS), rec.ID]) + "\n")

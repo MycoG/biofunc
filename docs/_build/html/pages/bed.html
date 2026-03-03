@@ -108,13 +108,13 @@ data-aria-dark="Switch to auto color mode">
 <h1>bed<a class="headerlink" href="#bed" title="Link to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="biofunc.bed.load_bed">
-<span class="sig-prename descclassname"><span class="pre">biofunc.bed.</span></span><span class="sig-name descname"><span class="pre">load_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#biofunc.bed.load_bed" title="Link to this definition">¶</a></dt>
-<dd><p>load BED file as pandas DataFrame</p>
+<span class="sig-prename descclassname"><span class="pre">biofunc.bed.</span></span><span class="sig-name descname"><span class="pre">load_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#biofunc.bed.load_bed" title="Link to this definition">¶</a></dt>
+<dd><p>Load BED file as pandas DataFrame. Automatically looks for a “{path}.header” file in the same directory to use as column labels</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> – path to BED file</p></li>
-<li><p><strong>header</strong> (<em>bool</em>) – look for .header file in same directory</p></li>
+<li><p><strong>path</strong> (<em>str</em>) – path to BED file</p></li>
+<li><p><strong>names</strong> (<em>list</em>) – names to be used for column labels</p></li>
 </ul>
 </dd>
 </dl>
@@ -122,7 +122,7 @@ data-aria-dark="Switch to auto color mode">
 
 <dl class="py function">
 <dt class="sig sig-object py" id="biofunc.bed.save_bed">
-<span class="sig-prename descclassname"><span class="pre">biofunc.bed.</span></span><span class="sig-name descname"><span class="pre">save_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#biofunc.bed.save_bed" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">biofunc.bed.</span></span><span class="sig-name descname"><span class="pre">save_bed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#biofunc.bed.save_bed" title="Link to this definition">¶</a></dt>
 <dd><p>save pandas dataframe as a BED file and header file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

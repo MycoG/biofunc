@@ -10,4 +10,5 @@
 ##PEDIGREE=<Name_0=G0-ID,Name_1=G1-ID,Name_N=GN-ID
 ##pedigreeDB=URL
 ##bcftools_viewVersion=1.19+htslib-1.19
+##random_thing_here=lalala
 #CHROM  POS ID  REF ALT QUAL    FILTER  INFO
