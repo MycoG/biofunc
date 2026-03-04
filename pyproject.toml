@@ -6,7 +6,6 @@ dependencies = [
     "numpy >=2.4.2",
     "matplotlib >=3.10.8",
     "scikit-allel",
-    "pysam", 
     "scipy",
     "cyvcf2",
 ]
@@ -49,3 +48,25 @@ build-backend = "flit_core.buildapi"
 abmindist = "biofunc.abmindist:main"
 plotmindist = "biofunc.plotmindist:main"
 calchet = "biofunc.calchet:main"
+
+
+[tool.pixi.workspace]
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[tool.pixi.pypi-dependencies]
+biofunc = { path = ".", editable = true }
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+doc = { features = ["doc"], solve-group = "default" }
+full = { features = ["full"], solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+bedtools = ">=2.31.1,<3"
+bcftools = ">=1.23,<2"
+htslib = ">=1.23,<2"
+samtools = ">=1.23,<2"
